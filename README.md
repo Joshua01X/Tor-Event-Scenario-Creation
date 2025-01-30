@@ -40,33 +40,42 @@
 // Installer name == tor-browser-windows-x86_64-portable-(version).exe
 // Detect the installer being downloaded
 DeviceFileEvents
-| where FileName startswith "tor"
+| where DeviceName == "<insert device name>"
+| where FileName has_any ("tor", "tor.exe", "firefox.exe")
+| project Timestamp, ActionType, FileName, FolderPath, InitiatingProcessAccountName, InitiatingProcessCommandLine, InitiatingProcessFolderPath, SHA256
+| order by Timestamp desc
 
 // TOR Browser being silently installed
-// Take note of two spaces before the /S (I don't know why)
+// Take note of two spaces before the /S 
 DeviceProcessEvents
-| where ProcessCommandLine contains "tor-browser-windows-x86_64-portable-14.0.1.exe  /S"
+| where DeviceName == "<insert device name>"
+| where ProcessCommandLine contains "tor-browser-windows"
 | project Timestamp, DeviceName, ActionType, FileName, ProcessCommandLine
 
 // TOR Browser or service was successfully installed and is present on the disk
 DeviceFileEvents
+| where DeviceName == "<insert device name>"
 | where FileName has_any ("tor.exe", "firefox.exe")
 | project  Timestamp, DeviceName, RequestAccountName, ActionType, InitiatingProcessCommandLine
 
 // TOR Browser or service was launched
 DeviceProcessEvents
-| where ProcessCommandLine has_any("tor.exe","firefox.exe")
-| project  Timestamp, DeviceName, AccountName, ActionType, ProcessCommandLine
+| where DeviceName == "<insert device name>"
+| where FileName has_any("tor.exe", "tor-browser.exe", "firefox.exe")
+| project Timestamp, AccountName, ActionType, FileName, FolderPath, ProcessCommandLine, SHA256
+| order by Timestamp desc
 
 // TOR Browser or service is being used and is actively creating network connections
 DeviceNetworkEvents
-| where InitiatingProcessFileName in~ ("tor.exe", "firefox.exe")
-| where RemotePort in (9001, 9030, 9040, 9050, 9051, 9150)
-| project Timestamp, DeviceName, InitiatingProcessAccountName, InitiatingProcessFileName, RemoteIP, RemotePort, RemoteUrl
+| where DeviceName == "<insert device name>"
+| where InitiatingProcessAccountName == "employee-012"
+| where RemotePort in ("9001", "9030", "9040", "9050", "9051", "9150")
+| project Timestamp, DeviceName, InitiatingProcessAccountName, ActionType, RemoteIP, RemotePort, RemoteUrl, InitiatingProcessFileName, InitiatingProcessFolderPath
 | order by Timestamp desc
 
 // User shopping list was created and, changed, or deleted
 DeviceFileEvents
+| where DeviceName == "<insert device name>"
 | where FileName contains "shopping-list.txt"
 ```
 
@@ -92,4 +101,5 @@ DeviceFileEvents
 ## Revision History:
 | **Version** | **Changes**                   | **Date**         | **Modified By**   |
 |-------------|-------------------------------|------------------|-------------------|
-| 1.0         | Initial draft                  | `January 30, 2025`  | `Joshua Balondo`   
+| 1.0         | Initial draft                  | `January 30, 2025`  | `Joshua Balondo` |
+| 2.0         | Specific result fetching                  | `January 30, 2025`  | `Joshua Balondo` |
