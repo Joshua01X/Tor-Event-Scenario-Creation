@@ -1,4 +1,4 @@
-# Threat Event (a href="https://github.com/Joshua01X/Unauthorized-Tor-Usage-Threat-Hunt">Unauthorized TOR Usage</a>)
+# Threat Event (<a href="https://github.com/Joshua01X/Unauthorized-Tor-Usage-Threat-Hunt">Unauthorized TOR Usage</a>)
 **Unauthorized TOR Browser Installation and Use**
 
 ## Steps the "Bad Actor" took Create Logs and IoCs:
